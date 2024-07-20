@@ -7,22 +7,22 @@ export default function Counter() {
   const jsonParams = {
     'Brand':'',
     'Article':'d5471',
-    'is_main_warehouse': 0,
+    'is_main_warehouse': 1,
     'Contract' : ''
   }
-  console.log(jsonParams)
+
   const urlStockByArticle = `tmpartsapi/StockByArticle?JSONparameter=${JSON.stringify(jsonParams)}`
   const headers = { 'Authorization': `Bearer ${apiKey}` }; // auth header with bearer token
-  const [parts, setParts] = useState("")
+  const [parts, setParts] = useState([])
 
-  async function search(formData) {
+  async function search(formData: any) {
     const query = formData.get("query");
 
     let response = await fetch(urlStockByArticle, { headers }).
       then(response => response.json())
-    await console.log(response)
 
-    setParts(JSON.stringify(response))
+    console.log((response.data))
+    // setParts(response)
   }
  
   return (
@@ -38,6 +38,7 @@ export default function Counter() {
       <button type="submit" className="text-white absolute lg:absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Поиск</button>
     </div>
       <div>
+      <Parts parts={parts} />
       <p className="text-sm"> 
       { parts }
       </p>
@@ -45,3 +46,73 @@ export default function Counter() {
 </form>
   )
 }
+
+function Parts(props: any) {
+  return(
+<div className="overflow-x-auto">
+  <table className="table table-xs">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Название</th>
+        <th>Бренд</th>
+        <th>Номер</th>
+        <th>Кол-во</th>
+        <th>Доставка</th>
+        <th>Цена</th>
+        <th></th>
+      </tr>
+    </thead>
+    <PartsList parts={props.parts} />
+    <tfoot>
+      <tr>
+        <th></th>
+        <th>Название</th>
+        <th>Бренд</th>
+        <th>Номер</th>
+        <th>Кол-во</th>
+        <th>Доставка</th>
+        <th>Цена</th>
+        <th></th>
+      </tr>
+    </tfoot>
+  </table>
+ </div>)
+}
+
+function PartsList(props: any) {
+  const parts= props.parts;
+  const listItems = parts.map((part: any) =>
+    <tr key={part.warehouse_offers.id} >
+    part.article
+    </tr>
+  );
+  return (
+    <tbody>{listItems}</tbody>
+  );
+}
+	// {
+	// 	"brand": "JD",
+	// 	"brand_alt": null,
+	// 	"article": "JAA0097",
+	// 	"article_alt": "JSA344223",
+	// 	"analog": 1,
+	// 	"article_name": "Амортизатор газомасляный задний /344223/",
+	// 	"min_price": 1152.62,
+	// 	"applicability": "",
+	// 	"warehouse_offers": [
+	// 		{
+	// 			"delivery_period": 0,
+	// 			"quantity": ">5",
+	// 			"branch_code": "ТИ002",
+	// 			"id": "4b9bcfba-2d55-42bc-ad1e-06c236051cee",
+	// 			"price": 1152.62,
+	// 			"min_part": 1,
+	// 			"warehouse_code": "ТИ070",
+	// 			"warehouse_name": "Иркутск",
+	// 			"is_main_warehouse": 1,
+	// 			"branch_name": "Иркутск",
+	// 			"name": "Амортизатор газомасляный задний /344223/"
+	// 		}
+	// 	]
+	// }
