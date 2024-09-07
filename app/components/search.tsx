@@ -1,28 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import { tissSearch } from "./search/tiss.ts";
 
-export default function Counter() {
-  const apiKey = process.env.NEXT_PUBLIC_TISS_API;
-  const jsonParams = {
-    Brand: "",
-    Article: "d5471",
-    is_main_warehouse: 1,
-    Contract: "",
-  };
-
-  const urlStockByArticle = `tmpartsapi/StockByArticle?JSONparameter=${JSON.stringify(jsonParams)}`;
-  const headers = { Authorization: `Bearer ${apiKey}` }; // auth header with bearer token
+export default function Search() {
   const [parts, setParts] = useState([]);
 
-  async function search(formData: any) {
+  async function search(formData: FormData) {
     const query = formData.get("query");
-
-    let response = await fetch(urlStockByArticle, { headers }).then(
-      (response) => response.json(),
-    );
-
-    console.log(response.data);
+    if (query) {
+      tissSearch(query);
+    }
+    console.log(query);
     // setParts(response)
   }
 
