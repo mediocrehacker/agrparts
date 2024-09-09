@@ -4,7 +4,7 @@ const nextConfig = {
     return [
       {
 	source: '/tmpartsapi/:path*',
-	destination: `http://api.tmparts.ru/api/:path*`,
+	destination: `https://api.tmparts.ru/api/:path*`,
       },
     ]
   },
