@@ -1,18 +1,53 @@
 "use client";
 
 import { useState } from "react";
-import { tissSearch } from "./search/tiss.ts";
+import { type Part, tissSearch } from "./search/tiss";
+
+type AutoPart = {
+  name: string;
+  analog: boolean;
+  brand: string;
+  article: string;
+  quantity: string;
+  price: number;
+  delivery: number;
+  company: string;
+};
+
+function tissPartToAutoPart(part: Part): AutoPart {
+  const autoPart = {
+    name: part.article_name,
+    analog: !part.analog,
+    brand: part.brand,
+    article: part.article,
+    quantity: "",
+    price: part.min_price,
+    delivery: 1,
+    company: "ТИСС",
+  };
+
+  return autoPart;
+}
 
 export default function Search() {
-  const [parts, setParts] = useState([]);
+  const [parts, setParts] = useState<Array<AutoPart>>([]);
 
   async function search(formData: FormData) {
     const query = formData.get("query");
+
+    let allParts: Array<AutoPart>;
+    let tissParts: Array<Part>;
     if (query) {
-      tissSearch(query);
+      tissParts = await tissSearch(query);
+      if (tissParts) {
+        const parts: AutoPart[] = tissParts.map((x: Part) =>
+          tissPartToAutoPart(x),
+        );
+        setParts(parts);
+      }
     }
-    console.log(query);
-    // setParts(response)
+
+    console.log(parts);
   }
 
   return (
@@ -55,7 +90,6 @@ export default function Search() {
       </div>
       <div>
         <Parts parts={parts} />
-        <p className="text-sm">{parts}</p>
       </div>
     </form>
   );
@@ -74,7 +108,7 @@ function Parts(props: any) {
             <th>Кол-во</th>
             <th>Доставка</th>
             <th>Цена</th>
-            <th></th>
+            <th>Компания</th>
           </tr>
         </thead>
         <PartsList parts={props.parts} />
@@ -87,7 +121,7 @@ function Parts(props: any) {
             <th>Кол-во</th>
             <th>Доставка</th>
             <th>Цена</th>
-            <th></th>
+            <th>Компания</th>
           </tr>
         </tfoot>
       </table>
@@ -95,35 +129,19 @@ function Parts(props: any) {
   );
 }
 
-function PartsList(props: any) {
+function PartsList(props: { parts: AutoPart[] }) {
   const parts = props.parts;
-  const listItems = parts.map((part: any) => (
-    <tr key={part.warehouse_offers.id}>part.article</tr>
+  const listItems = parts.map((part: AutoPart) => (
+    <tr key={part.article}>
+      <td></td>
+      <td>{part.name}</td>
+      <td>{part.brand}</td>
+      <td>{part.article}</td>
+      <td>{part.quantity}</td>
+      <td>{part.delivery}</td>
+      <td>{part.price}</td>
+      <td>{part.company}</td>
+    </tr>
   ));
   return <tbody>{listItems}</tbody>;
 }
-// {
-// 	"brand": "JD",
-// 	"brand_alt": null,
-// 	"article": "JAA0097",
-// 	"article_alt": "JSA344223",
-// 	"analog": 1,
-// 	"article_name": "Амортизатор газомасляный задний /344223/",
-// 	"min_price": 1152.62,
-// 	"applicability": "",
-// 	"warehouse_offers": [
-// 		{
-// 			"delivery_period": 0,
-// 			"quantity": ">5",
-// 			"branch_code": "ТИ002",
-// 			"id": "4b9bcfba-2d55-42bc-ad1e-06c236051cee",
-// 			"price": 1152.62,
-// 			"min_part": 1,
-// 			"warehouse_code": "ТИ070",
-// 			"warehouse_name": "Иркутск",
-// 			"is_main_warehouse": 1,
-// 			"branch_name": "Иркутск",
-// 			"name": "Амортизатор газомасляный задний /344223/"
-// 		}
-// 	]
-// }

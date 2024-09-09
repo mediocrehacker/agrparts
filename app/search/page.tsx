@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Search from "../components/search.tsx";
+import Search from "../components/search";
 
 export default function Home() {
   return (
@@ -20,7 +20,7 @@ export default function Home() {
             width={16}
             height={16}
           />
-         Инструкция 
+          Инструкция
         </a>
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
@@ -33,7 +33,7 @@ export default function Home() {
             width={16}
             height={16}
           />
-          Примеры 
+          Примеры
         </a>
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
@@ -49,7 +49,6 @@ export default function Home() {
           Связаться с нами →
         </a>
       </footer>
-
     </div>
   );
 }
