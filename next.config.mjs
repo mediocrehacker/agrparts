@@ -3,10 +3,10 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-	source: '/tmpartsapi/:path*',
-	destination: `http://api.tmparts.ru/api/:path*`,
+        source: "/tmpartsapi/:path*",
+        destination: `http://api.tmparts.ru/api/:path*`,
       },
-    ]
+    ];
   },
 };
 

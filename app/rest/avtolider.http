@@ -1,0 +1,7 @@
+# -*- restclient -*-
+#
+# Gets  all Github APIs, formats JSON, shows response status and headers underneath.
+# Also sends a User-Agent header, because the Github API requires this.
+#
+GET https://angarsk.autoleader1.ru/api/v1/search?access-token=_zz9_CoooOlNfbL5&article=044650W141
+User-Agent: Emacs Restclient

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { type Part, tissSearch } from "./search/tiss";
+import { avtoliderSearch } from "./search/avtolider";
 
 type AutoPart = {
   name: string;
@@ -32,21 +33,26 @@ function tissPartToAutoPart(part: Part): AutoPart {
 export default function Search() {
   const [parts, setParts] = useState<Array<AutoPart>>([]);
 
+  const lexus = "044650W141";
+
   async function search(formData: FormData) {
     const query = formData.get("query");
 
-    let allParts: Array<AutoPart>;
-    let tissParts: Array<Part>;
-    if (query) {
-      tissParts = await tissSearch(query);
-      if (tissParts) {
-        const parts: AutoPart[] = tissParts.map((x: Part) =>
-          tissPartToAutoPart(x),
-        );
-        setParts(parts);
-      }
-    }
+    // let allParts: Array<AutoPart>;
+    // let tissParts: Array<Part>;
+    // if (query) {
+    //   tissParts = await tissSearch(query);
+    //   if (tissParts) {
+    //     const parts: AutoPart[] = tissParts.map((x: Part) =>
+    //       tissPartToAutoPart(x),
+    //     );
+    //     setParts(parts);
+    //   }
+    // }
 
+    let avtoliderParts = avtoliderSearch(lexus);
+
+    console.log(avtoliderParts);
     console.log(parts);
   }
 
