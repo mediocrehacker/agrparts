@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { type Part, tissSearch } from "./search/tiss";
 import { avtoliderSearch } from "./search/avtolider";
 
@@ -32,8 +32,20 @@ function tissPartToAutoPart(part: Part): AutoPart {
 
 export default function Search() {
   const [parts, setParts] = useState<Array<AutoPart>>([]);
+  const [posts, setPosts] = useState(null);
 
   const lexus = "044650W141";
+
+  useEffect(() => {
+    async function fetchPosts() {
+      let res = await fetch("https://api.vercel.app/blog");
+      let data = await res.json();
+      setPosts(data);
+    }
+    fetchPosts();
+  }, []);
+
+  console.log("posts");
 
   async function search(formData: FormData) {
     const query = formData.get("query");
@@ -51,9 +63,6 @@ export default function Search() {
     // }
 
     let avtoliderParts = avtoliderSearch(lexus);
-
-    console.log(avtoliderParts);
-    console.log(parts);
   }
 
   return (
