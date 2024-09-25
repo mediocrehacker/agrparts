@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { getSearchResults } from "@/lib/search";
+import { type AutoPart, getSearchResults } from "@/lib/search";
 
 export default async function SearchPage({
   searchParams,
@@ -9,15 +9,19 @@ export default async function SearchPage({
   let article = searchParams.article?.toString() || "";
 
   const results = await getSearchResults(article);
-  console.log("results", results?.avtoliderParts);
+
+  let parts = results;
 
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] min-h-screen p-8 pb-20 gap-16 sm:p-20 ">
-      <main className="flex flex-col gap-8 ">
+    <div className="font-sans p-8 pb-20 gap-16 sm:p-20 ">
+      <main className="flex flex-col gap-8 min-h-[calc(100vh-230px)] ">
         <SearchForm value={article} />
+        <div className="relative w-full mx-auto max-w-screen-xl px-4">
+          <Parts parts={parts} />
+        </div>
       </main>
 
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
+      <footer className="mt-8 row-start-3 flex gap-6 flex-wrap items-center justify-center">
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
           href=""
@@ -104,4 +108,42 @@ function SearchForm(props: { value: string }) {
       </div>
     </form>
   );
+}
+function Parts(props: any) {
+  return (
+    <div className="overflow-x-auto w-full">
+      <table className="table table-xs">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Название</th>
+            <th>Бренд</th>
+            <th>Номер</th>
+            <th>Кол-во</th>
+            <th>Доставка</th>
+            <th>Цена</th>
+            <th>Компания</th>
+          </tr>
+        </thead>
+        <PartsList parts={props.parts} />
+      </table>
+    </div>
+  );
+}
+
+function PartsList(props: { parts: AutoPart[] }) {
+  const parts = props.parts;
+  const listItems = parts.map((part: AutoPart) => (
+    <tr key={part.article + part.company}>
+      <td></td>
+      <td>{part.name}</td>
+      <td>{part.brand}</td>
+      <td>{part.article}</td>
+      <td>{part.quantity}</td>
+      <td>{part.delivery}</td>
+      <td>{part.price}</td>
+      <td>{part.company}</td>
+    </tr>
+  ));
+  return <tbody>{listItems}</tbody>;
 }
