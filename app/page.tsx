@@ -1,14 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
-import { createClient } from "@/utils/supabase/server";
 
 export default async function Home() {
-  const supabase = createClient();
-  const { data: distributors } = await supabase.from("distributors").select();
-
   return (
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <pre>{JSON.stringify(distributors, null, 2)}</pre>;
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
         <h1 className="text-6xl">ALLPARTS</h1>
         <ol className="font-mono list-inside list-decimal text-sm text-center sm:text-left">

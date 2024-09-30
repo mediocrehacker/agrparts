@@ -14,7 +14,7 @@ export default async function SearchPage({
 
   return (
     <div className="font-sans p-8 pb-20 gap-16 sm:p-20 ">
-      <main className="flex flex-col gap-8 min-h-[calc(100vh-230px)] ">
+      <main className="flex flex-col gap-8 min-h-[calc(100vh-190px)] ">
         <SearchForm value={article} />
         <div className="relative w-full mx-auto max-w-screen-xl px-4">
           <Parts parts={parts} />
