@@ -7,10 +7,9 @@ export default async function PrivatePage() {
   const supabase = createClient();
   const { data, error } = await supabase.auth.getUser();
   const distributors = await supabase.from("distributors").select();
-  // const distributor_credentials = await supabase
-  // .from("distributor_credentials")
-  // .select("distributor_credentials"));
-  // console.log(distributor_credentials);
+  const distributor_credentials = await supabase
+    .from("distributor_credentials")
+    .select();
 
   return (
     <div className="font-sans grid grid-rows-[20px_1fr_20px] min-h-screen pb-16 pt-4 gap-16">
@@ -18,7 +17,11 @@ export default async function PrivatePage() {
 
       <main className="flex flex-col gap-8 w-full max-w-screen-xl px-8 mx-auto overflow-x-auto">
         <div className="relative w-full mx-auto">
-          <Distributors distributors={distributors} user={data?.user} />
+          <Distributors
+            distributors={distributors}
+            user={data?.user}
+            credentials={distributor_credentials}
+          />
         </div>
       </main>
 
@@ -26,32 +29,40 @@ export default async function PrivatePage() {
     </div>
   );
 }
-const Distributors = (props) => {
-  const listDistributors = props.distributors.data.map((x) => (
-    <li key={x.id} className="flex flex-col gap-2 m:gap-4 items-start">
-      <div className="min-w-24">{x.name}</div>
-      <form className="flex flex-row gap-4" action={addCredentials}>
-        <input
-          id="distrubutor_id"
-          name="distrubutor_id"
-          type="hidden"
-          defaultValue={x.id}
-        />
-        <input id="id" name="id" type="hidden" defaultValue={x.id} />
-        <input
-          id="token"
-          name="token"
-          type="text"
-          required
-          placeholder="API ключ"
-          className="input w-full max-w-lg"
-        />
-        <button className="btn btn-outline btn-primary" type="submit">
-          Обновить
-        </button>
-      </form>
-    </li>
-  ));
+
+const Distributors = (props: any) => {
+  const listDistributors = props.distributors.data.map((x: any) => {
+    const cred = props.credentials.data.filter(
+      (credential: any) => credential.distributor_id === x.id,
+    )[0];
+
+    return (
+      <li key={x.id} className="flex flex-col gap-2 m:gap-4 items-start">
+        <div className="min-w-24">{x.name}</div>
+        <form className="flex flex-row gap-4" action={addCredentials}>
+          <input
+            id="distributor_id"
+            name="distributor_id"
+            type="hidden"
+            defaultValue={x.id}
+          />
+          <input id="id" name="id" type="hidden" defaultValue={cred?.id} />
+          <input
+            id="token"
+            name="token"
+            type="text"
+            required
+            placeholder="API ключ"
+            className="input w-full max-w-lg"
+            defaultValue={cred?.token}
+          />
+          <button className="btn btn-outline btn-primary" type="submit">
+            Обновить
+          </button>
+        </form>
+      </li>
+    );
+  });
   return (
     <div>
       <ul className="flex flex-col gap-4">{listDistributors}</ul>
@@ -59,7 +70,7 @@ const Distributors = (props) => {
   );
 };
 
-const Navbar = (props) => {
+const Navbar = (props: any) => {
   return (
     <nav className="navbar ">
       <div className="flex-1">

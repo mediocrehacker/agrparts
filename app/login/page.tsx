@@ -67,7 +67,7 @@ export default function LoginPage({
   );
 }
 
-const Alert = (props) => {
+const Alert = (props: any) => {
   let message;
   if (props.message == "email_not_confirmed") {
     message = "Пожалуйста, подтвердите email.";

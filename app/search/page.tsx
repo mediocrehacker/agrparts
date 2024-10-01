@@ -157,7 +157,7 @@ function PartsList(props: { parts: AutoPart[] }) {
   return <tbody>{listItems}</tbody>;
 }
 
-const Navbar = (props) => {
+const Navbar = (props: any) => {
   return (
     <nav className="navbar ">
       <div className="flex-1">
