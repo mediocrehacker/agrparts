@@ -13,9 +13,7 @@ export async function getSearchResults(article: string) {
   parts = tissParts
     .map((x: TissPart) => tissPartToAutoPart(x))
     .concat(
-      avtoliderParts?.data?.map((x: AvtoliderPart) =>
-        avtoliderPartToAutoPart(x),
-      ),
+      avtoliderParts?.map((x: AvtoliderPart) => avtoliderPartToAutoPart(x)),
     );
 
   return parts;
@@ -32,7 +30,17 @@ export async function avtoliderSearch(article: string) {
     },
   }).then((response) => response.json());
 
-  return response;
+  let resp = response.data.filter(
+    (x: any) =>
+      x.stock_list.length > 0 &&
+      x.stock_list.filter(
+        (y: any) => y.warehouse_id === 19 || y.warehouse_id === 47,
+      ).length > 0,
+  );
+  // angrask
+  // warehouse_id: 19
+  // warehouse_id: 47
+  return resp;
 }
 
 export async function tissSearch(article: any): Promise<Array<TissPart>> {
@@ -141,3 +149,50 @@ export type AvtoliderWaerhouse = {
   price: 786;
   quantity: 2;
 };
+
+const avtoliderWarehouse = [
+  "ул. 17 микрорайон, 21а, (ТЦ Автомобили, пав. 6)",
+  "ул. Старо-Кузмихинской, 86/1",
+  "ул. Полярная, 117а",
+  "ул. Сергеева, 3а, (ТЦ  АвтоСити пав. 40, склад)",
+  "ул. Рабочего штаба, 46/1, (Склад)",
+  "ул. Сергеева, 3а, (ТЦ АвтоСити, пав. 61)",
+  "ул. Стопани, 12",
+  "ул. Ленина, 26",
+  "Микрорайон Солнечный, 45",
+  "ул. Ленина, 149в",
+  "ул. Олимпийская, 25",
+  "ул. Сибиряков-Гвардейцев, 49а, к5",
+  "ул. Сельскохозяйственная, 4А, корпус 2",
+  "ул. Новая, 13",
+  "ул. Ленина, 13а",
+  "ул. Гайдашовка, 8в, (Склад 1-й этаж)",
+  "ул. Сельскохозяйственная, 1Г (2 этаж)",
+  "ул. Сибиряков-Гвардейцев, 47, к2, (ТЦ Н54, пав. 2)",
+  "ул. Богдана Хмельницкого, 1/1, (ТЦ АвтоМолл, пав. 1)",
+  "ул. Брянская, 15",
+  "ул. Петухова, 51б, к7, (Рынок Столица, пав. 1, место 14)",
+  " ул. Генерала Доватора, 39, (ТЦ Прибой, пав. 72)",
+  " ул. Октябрьской Революции, 1, (ТЦ Автоград, пристрой №29)",
+  "ул. Баррикад 129/9, (Склад №11)",
+  "Склад 51",
+  "ул. Проспект Автомобилистов, 3в, (Склад №2)",
+  "ул. Трубачеева, 154 к1, (Склад №4)",
+  "ул. Борсоева, 58, (Склад №3)",
+  "Склад 30",
+  "Склад 40",
+  "Склад 60",
+  "Склад  23",
+  "Склад 220",
+  "Склад 22",
+  "Склад 240",
+  "Склад 18",
+  "Склад 50",
+  "Склад 221",
+  "Склад 19",
+  "Склад  52",
+  "Склад 24",
+  "Склад 44",
+  "Склад 301",
+  "Склад 21",
+];
