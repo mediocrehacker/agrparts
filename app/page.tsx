@@ -4,7 +4,6 @@ import Link from "next/link";
 export default async function Home() {
   return (
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen pb-24 pt-4  gap-16">
-      <Navbar />
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
         <h1 className="text-6xl">ПРОЦЕНКА</h1>
         <ol className="font-mono list-inside list-decimal text-sm text-center sm:text-left">

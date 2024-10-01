@@ -19,11 +19,11 @@ export async function login(formData: FormData) {
 
   if (error) {
     console.error(error);
-    redirect("/error");
+    redirect(`/login?message=${error.code}`);
   }
 
   revalidatePath("/", "layout");
-  redirect("/");
+  redirect("/search");
 }
 
 export async function signup(formData: FormData) {

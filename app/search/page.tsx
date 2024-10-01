@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { type AutoPart, getSearchResults } from "@/lib/search";
-import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 
 export default async function SearchPage({
@@ -19,13 +18,15 @@ export default async function SearchPage({
   let parts = results;
 
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] min-h-screen pb-16 pt-4 gap-16">
-      <Navbar />
+    <div className="font-sans grid grid-rows-[20px_1fr_20px] min-h-screen pb-24 pt-4 gap-16 lg:pb-16">
+      <Navbar user={data?.user} />
 
-      <main className="flex flex-col gap-8 w-full max-w-screen-xl px-8">
-        <SearchForm value={article} />
-        <div className="relative w-full mx-auto  ">
-          <Parts parts={parts} />
+      <main className="relative overflow-x-auto mx-auto">
+        <div className="border-base-300 flex flex-col min-w-[18rem] max-w-4xl items-start justify-start gap-8 overflow-x-auto p-4">
+          <SearchForm value={article} />
+          <div className="">
+            <Parts parts={parts} />
+          </div>
         </div>
       </main>
 
@@ -119,7 +120,7 @@ function SearchForm(props: { value: string }) {
 }
 function Parts(props: any) {
   return (
-    <div className="overflow-x-auto w-full">
+    <div className="overflow-x-auto">
       <table className="table table-xs">
         <thead>
           <tr>
@@ -156,16 +157,24 @@ function PartsList(props: { parts: AutoPart[] }) {
   return <tbody>{listItems}</tbody>;
 }
 
-const Navbar = () => {
+const Navbar = (props) => {
   return (
     <nav className="navbar ">
       <div className="flex-1">
-        <a className="text-xl"></a>
+        <Link href="search" className="btn btn-ghost text-xl text-primary">
+          ПРОЦЕНКА
+        </Link>
       </div>
       <div className="flex-none">
         <ul className="menu menu-horizontal px-1">
           <li>
-            <Link href="login">Войти / Зарегистрироваться</Link>
+            {(() => {
+              if (props.user) {
+                return <Link href="distributors">Поставщики</Link>;
+              } else {
+                return <Link href="login">Войти / Зарегистрироваться</Link>;
+              }
+            })()}
           </li>
         </ul>
       </div>
