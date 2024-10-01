@@ -12,7 +12,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "ALLPARTS",
+  title: "ПРОЦЕНКА",
   description: "Все поставщики в одном месте.",
 };
 

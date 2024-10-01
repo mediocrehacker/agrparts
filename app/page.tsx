@@ -3,12 +3,13 @@ import Link from "next/link";
 
 export default async function Home() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
+    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen pb-24 pt-4  gap-16">
+      <Navbar />
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <h1 className="text-6xl">ALLPARTS</h1>
+        <h1 className="text-6xl">ПРОЦЕНКА</h1>
         <ol className="font-mono list-inside list-decimal text-sm text-center sm:text-left">
-          <li className="mb-2">Сервис по поиску автозапчастей.</li>
-          <li>Все поставщики в одном месте.</li>
+          <li className="mb-2">Сервис по поиску автозапчастей</li>
+          <li>Все поставщики в одном месте</li>
         </ol>
 
         <div className="flex gap-4 items-center flex-col sm:flex-row">
@@ -77,3 +78,20 @@ export default async function Home() {
     </div>
   );
 }
+
+const Navbar = () => {
+  return (
+    <nav className="navbar ">
+      <div className="flex-1">
+        <a className="text-xl"></a>
+      </div>
+      <div className="flex-none">
+        <ul className="menu menu-horizontal px-1">
+          <li>
+            <Link href="login">Войти / Зарегистрироваться</Link>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  );
+};

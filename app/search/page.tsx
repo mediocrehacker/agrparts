@@ -1,11 +1,17 @@
 import Image from "next/image";
+import Link from "next/link";
 import { type AutoPart, getSearchResults } from "@/lib/search";
+import { redirect } from "next/navigation";
+import { createClient } from "@/utils/supabase/server";
 
 export default async function SearchPage({
   searchParams,
 }: {
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
+  const supabase = createClient();
+  const { data, error } = await supabase.auth.getUser();
+
   let article = searchParams.article?.toString() || "";
 
   const results = await getSearchResults(article);
@@ -13,10 +19,12 @@ export default async function SearchPage({
   let parts = results;
 
   return (
-    <div className="font-sans p-8 pb-20 gap-16 sm:p-20 ">
-      <main className="flex flex-col gap-8 min-h-[calc(100vh-190px)] ">
+    <div className="font-sans grid grid-rows-[20px_1fr_20px] min-h-screen pb-16 pt-4 gap-16">
+      <Navbar />
+
+      <main className="flex flex-col gap-8 w-full max-w-screen-xl px-8">
         <SearchForm value={article} />
-        <div className="relative w-full mx-auto max-w-screen-xl px-4">
+        <div className="relative w-full mx-auto  ">
           <Parts parts={parts} />
         </div>
       </main>
@@ -68,7 +76,7 @@ export default async function SearchPage({
 
 function SearchForm(props: { value: string }) {
   return (
-    <form action="/search" className="md:w-full lg:w-1/2 mx-auto">
+    <form action="/search" className="w-full mx-auto">
       <label className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">
         Search
       </label>
@@ -147,3 +155,20 @@ function PartsList(props: { parts: AutoPart[] }) {
   ));
   return <tbody>{listItems}</tbody>;
 }
+
+const Navbar = () => {
+  return (
+    <nav className="navbar ">
+      <div className="flex-1">
+        <a className="text-xl"></a>
+      </div>
+      <div className="flex-none">
+        <ul className="menu menu-horizontal px-1">
+          <li>
+            <Link href="login">Войти / Зарегистрироваться</Link>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  );
+};
