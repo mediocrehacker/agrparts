@@ -1,22 +1,62 @@
+import soapRequest from "easy-soap-request";
+
 export async function getSearchResults(article: string) {
-  const example = "044650W141";
+  const example = "044650W141" || "1780102030";
   let parts: AutoPart[] = [];
 
   if (!article) {
     return parts;
   }
 
-  const avtoliderParts = await avtoliderSearch(article);
+  const rosskoParts = await rosskoSearch(article);
+  // const avtoliderParts = await avtoliderSearch(article);
 
-  const tissParts = await tissSearch(article);
+  // const tissParts = await tissSearch(article);
 
-  parts = tissParts
-    .map((x: TissPart) => tissPartToAutoPart(x))
-    .concat(
-      avtoliderParts?.map((x: AvtoliderPart) => avtoliderPartToAutoPart(x)),
-    );
+  // parts = tissParts
+  //   .map((x: TissPart) => tissPartToAutoPart(x))
+  //   .concat(
+  //     avtoliderParts?.map((x: AvtoliderPart) => avtoliderPartToAutoPart(x)),
+  //   );
 
   return parts;
+}
+
+export async function rosskoSearch(article: string) {
+  const key1 = process.env.NEXT_PUBLIC_ROSSKO_KEY1;
+  const key2 = process.env.NEXT_PUBLIC_ROSSKO_KEY2;
+
+  const url = "http://api.rossko.ru/service/v2.1/GetSearch";
+  const sampleHeaders = {
+    "Content-Type": "text/xml;charset=UTF-8",
+  };
+
+  const xml = `<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:api="http://api.rossko.ru/">
+     <soapenv:Header/>
+     <soapenv:Body>
+        <api:GetSearch>
+           <api:KEY1>${key1}</api:KEY1>
+           <api:KEY2>${key2}</api:KEY2>
+           <api:text>${article}</api:text>
+           <api:delivery_id>000000001</api:delivery_id>
+        </api:GetSearch>
+     </soapenv:Body>
+  </soapenv:Envelope>`;
+
+  const resp = await soapRequest({
+    url: url,
+    headers: sampleHeaders,
+    xml: xml,
+    timeout: 5000,
+  });
+  console.log(resp);
+
+  // const { headers, body, statusCode } = response;
+  // console.log(headers);
+  // console.log(body);
+  // console.log(statusCode);
+
+  return "";
 }
 
 export async function avtoliderSearch(article: string) {
@@ -59,11 +99,31 @@ export async function tissSearch(article: any): Promise<Array<TissPart>> {
   const urlStockByArticle = `http://api.tmparts.ru/api/StockByArticle?JSONparameter=${JSON.stringify(params)}`;
   const headers = { Authorization: `Bearer ${apiKey}` }; // auth header with bearer token
 
-  let response: Array<TissPart> = await fetch(urlStockByArticle, {
+  let resp: Array<TissPart> = await fetch(urlStockByArticle, {
     headers,
   }).then((response) => response.json());
 
-  return response;
+  //let angarskResp =
+
+  // warehouse_id: 19,
+  // const arr = resp
+  // .map((x) => x.warehouse_offers)
+  // .flat()
+  // .map((y) => y.warehouse_id)
+  // .map((y) => ({
+  // id: y.warehouse_code,
+  // name: y.warehouse_name,
+  // branch: y.branch_name,
+  // }));
+  //
+  // let setObj = new Set(arr.map(JSON.stringify));
+  // let output = Array.from(setObj).map(JSON.parse);
+  // .flat()
+  // .filter(onlyUnique)
+  // .sort((a, b) => a.id - b.id);
+
+  // console.log(arr);
+  return resp;
 }
 
 function tissPartToAutoPart(part: TissPart): AutoPart {
