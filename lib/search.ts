@@ -1,4 +1,5 @@
 import soapRequest from "easy-soap-request";
+import convert from "xml-js";
 
 export async function getSearchResults(article: string) {
   const example = "044650W141" || "1780102030";
@@ -8,18 +9,56 @@ export async function getSearchResults(article: string) {
     return parts;
   }
 
-  const rosskoParts = await rosskoSearch(article);
-  // const avtoliderParts = await avtoliderSearch(article);
+  const rosskoPartsXml = await rosskoSearch(article);
+  const rosskoPartsShortList = rosskoParse(rosskoPartsXml);
+  const rosskoParts = rosskoPartsShortList.map((x: any) => rosskoToAutoPart(x));
 
-  // const tissParts = await tissSearch(article);
+  const avtoliderParts = await avtoliderSearch(article);
 
-  // parts = tissParts
-  //   .map((x: TissPart) => tissPartToAutoPart(x))
-  //   .concat(
-  //     avtoliderParts?.map((x: AvtoliderPart) => avtoliderPartToAutoPart(x)),
-  //   );
+  const tissParts = await tissSearch(article);
+
+  parts = tissParts
+    .map((x: TissPart) => tissPartToAutoPart(x))
+    .concat(
+      avtoliderParts?.map((x: AvtoliderPart) => avtoliderPartToAutoPart(x)),
+    )
+    .concat(rosskoParts);
 
   return parts;
+}
+
+function rosskoParse(xml: any) {
+  try {
+    let options = {
+      compact: true,
+      ignoreDeclaration: true,
+    };
+
+    let rosskoParts: any = convert.xml2js(xml, options);
+
+    const partList =
+      rosskoParts["SOAP-ENV:Envelope"]["SOAP-ENV:Body"][
+        "ns1:GetSearchResponse"
+      ]["ns1:SearchResult"]["ns1:PartsList"]["ns1:Part"];
+
+    const partShortList = partList[0]["ns1:crosses"]["ns1:Part"]?.filter(
+      (e: any) => {
+        let stock = e["ns1:stocks"]["ns1:stock"][0];
+        if (stock) {
+          return (
+            stock["ns1:description"]._text === "Иркутск" ||
+            stock["ns1:description"]._text === "Ангарск, 279-й квартал, 5/1"
+          );
+        }
+      },
+    );
+
+    // 'ns1:description': { _text: 'Ангарск, 279-й квартал, 5/1' },
+    // 'ns1:description': { _text: 'Иркутск' },
+    return partShortList;
+  } catch (error) {
+    return [];
+  }
 }
 
 export async function rosskoSearch(article: string) {
@@ -49,14 +88,10 @@ export async function rosskoSearch(article: string) {
     xml: xml,
     timeout: 5000,
   });
-  console.log(resp);
 
-  // const { headers, body, statusCode } = response;
-  // console.log(headers);
-  // console.log(body);
-  // console.log(statusCode);
+  const { headers, body, statusCode } = resp.response;
 
-  return "";
+  return body;
 }
 
 export async function avtoliderSearch(article: string) {
@@ -126,6 +161,23 @@ export async function tissSearch(article: any): Promise<Array<TissPart>> {
   return resp;
 }
 
+function rosskoToAutoPart(part: any): AutoPart {
+  // console.log(part["ns1:stocks"]["ns1:stock"])
+
+  const autoPart = {
+    name: part["ns1:name"]._text,
+    analog: true,
+    brand: part["ns1:brand"]._text,
+    article: part["ns1:partnumber"]._text,
+    quantity: "",
+    price: part.min_price,
+    delivery: 1,
+    company: "Rossko",
+  };
+
+  return autoPart;
+}
+
 function tissPartToAutoPart(part: TissPart): AutoPart {
   const autoPart = {
     name: part.article_name,
@@ -140,6 +192,7 @@ function tissPartToAutoPart(part: TissPart): AutoPart {
 
   return autoPart;
 }
+
 function avtoliderPartToAutoPart(part: AvtoliderPart): AutoPart {
   const price = Math.min(...part.stock_list.map((x) => x.price));
 
