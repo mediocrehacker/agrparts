@@ -162,7 +162,7 @@ export async function tissSearch(article: any): Promise<Array<TissPart>> {
 }
 
 function rosskoToAutoPart(part: any): AutoPart {
-  // console.log(part["ns1:stocks"]["ns1:stock"])
+  // console.log(part["ns1:stocks"]["ns1:stock"][0]);
 
   const autoPart = {
     name: part["ns1:name"]._text,
@@ -170,7 +170,7 @@ function rosskoToAutoPart(part: any): AutoPart {
     brand: part["ns1:brand"]._text,
     article: part["ns1:partnumber"]._text,
     quantity: "",
-    price: part.min_price,
+    price: part["ns1:stocks"]["ns1:stock"][0]["ns1:price"]._text,
     delivery: 1,
     company: "Rossko",
   };
