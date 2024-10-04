@@ -9,22 +9,49 @@ export async function getSearchResults(article: string) {
     return parts;
   }
 
-  const rosskoPartsXml = await rosskoSearch(article);
-  const rosskoPartsShortList = rosskoParse(rosskoPartsXml);
-  const rosskoParts = rosskoPartsShortList.map((x: any) => rosskoToAutoPart(x));
+  const msParts = await msSearch(article);
+  // const rosskoPartsXml = await rosskoSearch(article);
+  // const rosskoPartsShortList = rosskoParse(rosskoPartsXml);
+  // const rosskoParts = rosskoPartsShortList.map((x: any) => rosskoToAutoPart(x));
 
-  const avtoliderParts = await avtoliderSearch(article);
+  // const avtoliderParts = await avtoliderSearch(article);
 
-  const tissParts = await tissSearch(article);
+  // const tissParts = await tissSearch(article);
 
-  parts = tissParts
-    .map((x: TissPart) => tissPartToAutoPart(x))
-    .concat(
-      avtoliderParts?.map((x: AvtoliderPart) => avtoliderPartToAutoPart(x)),
-    )
-    .concat(rosskoParts);
+  // parts = tissParts
+  //   .map((x: TissPart) => tissPartToAutoPart(x))
+  //   .concat(
+  //     avtoliderParts?.map((x: AvtoliderPart) => avtoliderPartToAutoPart(x)),
+  //   )
+  //   .concat(rosskoParts);
 
+  parts = msParts;
   return parts;
+}
+
+async function msSearch(article: string) {
+  const session = process.env.NEXT_PUBLIC_MX_SESSION;
+
+  const url = `http://zakaz.mxgroup.ru/mxapi/?session=${session}&m=getstores`;
+
+  console.log(url);
+  const sampleHeaders = {
+    "Content-Type": "text/xml;charset=UTF-8",
+  };
+
+  const resp = await soapRequest({
+    url: url,
+    headers: sampleHeaders,
+    // xml: xml,
+    timeout: 5000,
+  });
+
+  const { body } = resp.response;
+
+  // let result = resp.response;
+
+  console.log(body);
+  return [];
 }
 
 function rosskoParse(xml: any) {
