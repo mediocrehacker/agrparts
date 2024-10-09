@@ -5,7 +5,7 @@ function onlyUnique(value, index, array) {
   return array.indexOf(value) === index;
 }
 
-export async function getSearchResults(article: string) {
+export async function getSearchResults(article: string, city: string) {
   const example = "044650W141" || "1780102030";
   let parts: AutoPart[] = [];
 
@@ -15,8 +15,45 @@ export async function getSearchResults(article: string) {
 
   const rosskoPartsXml = await rosskoSearch(article);
   const rosskoPartsListWithBrands = rosskoParse(rosskoPartsXml);
-  const rosskoPartsShortList = rosskoPartsListWithBrands
-    .map((x: any) => rosskoPerBrand(x))
+  const uniqueRossko = getUniqueRossko(rosskoPartsListWithBrands);
+  let rosskoParts = uniqueRossko.map((x: any) => rosskoToAutoPartNew(x));
+
+  city = "Angarsk";
+
+  if (city) {
+    rosskoParts = rosskoFilterByCity(rosskoParts, city);
+  }
+  const avtoliderParts = await avtoliderSearch(article);
+
+  const tissParts = await tissSearch(article);
+
+  parts = tissParts
+    .map((x: TissPart) => tissPartToAutoPart(x))
+    .concat(
+      avtoliderParts?.map((x: AvtoliderPart) => avtoliderPartToAutoPart(x)),
+    )
+    .concat(rosskoParts);
+
+  return parts;
+}
+function rosskoFilterByCity(parts: AutoPart[], city: string) {
+  parts = parts.filter((e: any) => {
+    let stock = e.extra["ns1:stocks"]["ns1:stock"][0];
+    if (stock) {
+      return (
+        stock["ns1:description"]._text === "Иркутск" ||
+        stock["ns1:description"]._text === "Ангарск, 279-й квартал, 5/1"
+      );
+    }
+  });
+  // 'ns1:description': { _text: 'Ангарск, 279-й квартал, 5/1' },
+  // 'ns1:description': { _text: 'Иркутск' },
+
+  return parts;
+}
+function getUniqueRossko(brands: any): any {
+  let rosskoPartsShortList = brands
+    .map((x: any) => x["ns1:crosses"]["ns1:Part"])
     .flat();
 
   let uniqueArr = [];
@@ -30,32 +67,7 @@ export async function getSearchResults(article: string) {
     }
   });
 
-  const rosskoParts = uniqueArr.map((x: any) => rosskoToAutoPartNew(x));
-
-  // const avtoliderParts = await avtoliderSearch(article);
-
-  // const tissParts = await tissSearch(article);
-
-  // parts = tissParts
-  //   .map((x: TissPart) => tissPartToAutoPart(x))
-  //   .concat(
-  //     avtoliderParts?.map((x: AvtoliderPart) => avtoliderPartToAutoPart(x)),
-  //   )
-  //   .concat(rosskoParts);
-
-  parts = rosskoParts;
-
-  return parts;
-}
-
-function rosskoPerBrand(brand: any): any {
-  let result;
-
-  result = brand["ns1:crosses"]["ns1:Part"];
-  // console.log(result["ns1:stocks"]["ns1:stock"]);
-  // console.log(result["ns1:crosses"]["ns1:Part"]);
-
-  return result;
+  return uniqueArr;
 }
 
 function rosskoToAutoPartNew(part: any): AutoPart {
@@ -75,6 +87,7 @@ function rosskoToAutoPartNew(part: any): AutoPart {
     price,
     delivery: 1,
     company: "Rossko",
+    extra: part,
   };
 
   return autoPart;
@@ -253,6 +266,7 @@ function rosskoToAutoPart(part: any): AutoPart {
     price,
     delivery: 1,
     company: "Rossko",
+    extra: part,
   };
 
   return autoPart;
@@ -268,6 +282,7 @@ function tissPartToAutoPart(part: TissPart): AutoPart {
     price: part.min_price,
     delivery: 1,
     company: "ТИСС",
+    extra: part,
   };
 
   return autoPart;
@@ -285,6 +300,7 @@ function avtoliderPartToAutoPart(part: AvtoliderPart): AutoPart {
     price,
     delivery: 1,
     company: "Автолидер",
+    extra: part,
   };
 
   return autoPart;
@@ -299,6 +315,7 @@ export type AutoPart = {
   price: number;
   delivery: number;
   company: string;
+  extra: any;
 };
 
 export type TissWarehouse = {
