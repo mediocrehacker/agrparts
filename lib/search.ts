@@ -1,10 +1,6 @@
 import soapRequest from "easy-soap-request";
 import convert from "xml-js";
 
-function onlyUnique(value, index, array) {
-  return array.indexOf(value) === index;
-}
-
 export async function getSearchResults(article: string, city: string) {
   const example = "044650W141" || "1780102030";
   let parts: AutoPart[] = [];
@@ -18,7 +14,7 @@ export async function getSearchResults(article: string, city: string) {
   const uniqueRossko = getUniqueRossko(rosskoPartsListWithBrands);
   let rosskoParts = uniqueRossko.map((x: any) => rosskoToAutoPartNew(x));
 
-  city = "Angarsk";
+  city = "angarsk";
 
   if (city) {
     rosskoParts = rosskoFilterByCity(rosskoParts, city);
@@ -36,6 +32,7 @@ export async function getSearchResults(article: string, city: string) {
 
   return parts;
 }
+
 function rosskoFilterByCity(parts: AutoPart[], city: string) {
   parts = parts.filter((e: any) => {
     let stock = e.extra["ns1:stocks"]["ns1:stock"][0];
@@ -56,11 +53,11 @@ function getUniqueRossko(brands: any): any {
     .map((x: any) => x["ns1:crosses"]["ns1:Part"])
     .flat();
 
-  let uniqueArr = [];
-  rosskoPartsShortList.forEach((obj) => {
+  let uniqueArr: any[] = [];
+  rosskoPartsShortList.forEach((obj: any) => {
     if (
       !uniqueArr.find(
-        (item) => item["ns1:guid"]._text === obj["ns1:guid"]._text,
+        (item: any) => item["ns1:guid"]._text === obj["ns1:guid"]._text,
       )
     ) {
       uniqueArr.push(obj);

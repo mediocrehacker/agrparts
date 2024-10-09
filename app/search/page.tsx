@@ -13,7 +13,7 @@ export default async function SearchPage({
 
   let article = searchParams.article?.toString() || "";
 
-  const results = await getSearchResults(article);
+  const results = await getSearchResults(article, "angarsk");
 
   let parts = results;
 
@@ -21,10 +21,10 @@ export default async function SearchPage({
     <div className="font-sans grid grid-rows-[20px_1fr_20px] min-h-screen pb-24 pt-4 gap-16 lg:pb-16">
       <Navbar user={data?.user} />
 
-      <main className="relative overflow-x-auto mx-auto">
-        <div className="border-base-300 flex flex-col min-w-[18rem] max-w-4xl items-start justify-start gap-8 overflow-x-auto p-4">
+      <main className="container relative overflow-x-auto mx-auto ">
+        <div className="border-base-300 flex flex-col gap-8 overflow-x-auto p-4">
           <SearchForm value={article} />
-          <div className="">
+          <div className="w-full">
             <Parts parts={parts} />
           </div>
         </div>
@@ -121,17 +121,16 @@ function SearchForm(props: { value: string }) {
 function Parts(props: any) {
   return (
     <div className="overflow-x-auto">
-      <table className="table table-xs">
+      <table className="table table-zebra">
         <thead>
           <tr>
             <th></th>
             <th>Название</th>
             <th>Бренд</th>
             <th>Номер</th>
-            <th>Кол-во</th>
-            <th>Доставка</th>
-            <th>Цена</th>
             <th>Компания</th>
+            <th>Город</th>
+            <th className="text-right">Цена ₽</th>
           </tr>
         </thead>
         <PartsList parts={props.parts} />
@@ -143,16 +142,17 @@ function Parts(props: any) {
 function PartsList(props: { parts: AutoPart[] }) {
   const parts = props.parts;
   const listItems = parts.map((part: AutoPart) => (
-    <tr key={part.article + part.company}>
-      <td></td>
-      <td>{part.name}</td>
-      <td>{part.brand}</td>
-      <td>{part.article}</td>
-      <td>{part.quantity}</td>
-      <td>{part.delivery}</td>
-      <td>{part.price}</td>
-      <td>{part.company}</td>
-    </tr>
+    <>
+      <tr className="hover cursor-pointer" key={part.article + part.company}>
+        <td></td>
+        <td>{part.name}</td>
+        <td>{part.brand}</td>
+        <td>{part.article}</td>
+        <td>{part.company}</td>
+        <td></td>
+        <td className="text-right font-bold">{part.price}</td>
+      </tr>
+    </>
   ));
   return <tbody>{listItems}</tbody>;
 }
