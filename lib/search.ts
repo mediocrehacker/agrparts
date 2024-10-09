@@ -1,6 +1,10 @@
 import soapRequest from "easy-soap-request";
 import convert from "xml-js";
 
+function onlyUnique(value, index, array) {
+  return array.indexOf(value) === index;
+}
+
 export async function getSearchResults(article: string) {
   const example = "044650W141" || "1780102030";
   let parts: AutoPart[] = [];
@@ -10,21 +14,70 @@ export async function getSearchResults(article: string) {
   }
 
   const rosskoPartsXml = await rosskoSearch(article);
-  const rosskoPartsShortList = rosskoParse(rosskoPartsXml);
-  const rosskoParts = rosskoPartsShortList.map((x: any) => rosskoToAutoPart(x));
+  const rosskoPartsListWithBrands = rosskoParse(rosskoPartsXml);
+  const rosskoPartsShortList = rosskoPartsListWithBrands
+    .map((x: any) => rosskoPerBrand(x))
+    .flat();
 
-  const avtoliderParts = await avtoliderSearch(article);
+  let uniqueArr = [];
+  rosskoPartsShortList.forEach((obj) => {
+    if (
+      !uniqueArr.find(
+        (item) => item["ns1:guid"]._text === obj["ns1:guid"]._text,
+      )
+    ) {
+      uniqueArr.push(obj);
+    }
+  });
 
-  const tissParts = await tissSearch(article);
+  const rosskoParts = uniqueArr.map((x: any) => rosskoToAutoPartNew(x));
 
-  parts = tissParts
-    .map((x: TissPart) => tissPartToAutoPart(x))
-    .concat(
-      avtoliderParts?.map((x: AvtoliderPart) => avtoliderPartToAutoPart(x)),
-    )
-    .concat(rosskoParts);
+  // const avtoliderParts = await avtoliderSearch(article);
+
+  // const tissParts = await tissSearch(article);
+
+  // parts = tissParts
+  //   .map((x: TissPart) => tissPartToAutoPart(x))
+  //   .concat(
+  //     avtoliderParts?.map((x: AvtoliderPart) => avtoliderPartToAutoPart(x)),
+  //   )
+  //   .concat(rosskoParts);
+
+  parts = rosskoParts;
 
   return parts;
+}
+
+function rosskoPerBrand(brand: any): any {
+  let result;
+
+  result = brand["ns1:crosses"]["ns1:Part"];
+  // console.log(result["ns1:stocks"]["ns1:stock"]);
+  // console.log(result["ns1:crosses"]["ns1:Part"]);
+
+  return result;
+}
+
+function rosskoToAutoPartNew(part: any): AutoPart {
+  let price;
+  try {
+    price = part["ns1:stocks"]["ns1:stock"][0]["ns1:price"]._text;
+  } catch {
+    price = -1;
+  }
+
+  const autoPart = {
+    name: part["ns1:name"]._text,
+    analog: true,
+    brand: part["ns1:brand"]._text,
+    article: part["ns1:partnumber"]._text,
+    quantity: "",
+    price,
+    delivery: 1,
+    company: "Rossko",
+  };
+
+  return autoPart;
 }
 
 function rosskoParse(xml: any) {
@@ -41,21 +94,41 @@ function rosskoParse(xml: any) {
         "ns1:GetSearchResponse"
       ]["ns1:SearchResult"]["ns1:PartsList"]["ns1:Part"];
 
-    const partShortList = partList[0]["ns1:crosses"]["ns1:Part"]?.filter(
-      (e: any) => {
-        let stock = e["ns1:stocks"]["ns1:stock"][0];
-        if (stock) {
-          return (
-            stock["ns1:description"]._text === "Иркутск" ||
-            stock["ns1:description"]._text === "Ангарск, 279-й квартал, 5/1"
-          );
-        }
-      },
-    );
+    // return partList.filter((brand: any) => brand["ns1:stocks"]);
+    return partList;
+  } catch (error) {
+    return [];
+  }
+}
+
+function rosskoParseOld(xml: any) {
+  try {
+    let options = {
+      compact: true,
+      ignoreDeclaration: true,
+    };
+
+    let rosskoParts: any = convert.xml2js(xml, options);
+
+    const partList =
+      rosskoParts["SOAP-ENV:Envelope"]["SOAP-ENV:Body"][
+        "ns1:GetSearchResponse"
+      ]["ns1:SearchResult"]["ns1:PartsList"]["ns1:Part"];
+    // const partShortList = partList[0]["ns1:crosses"]["ns1:Part"]?.filter(
+    // (e: any) => {
+    // let stock = e["ns1:stocks"]["ns1:stock"][0];
+    // if (stock) {
+    // return (
+    // stock["ns1:description"]._text === "Иркутск" ||
+    // stock["ns1:description"]._text === "Ангарск, 279-й квартал, 5/1"
+    // );
+    // }
+    // },
+    // );
 
     // 'ns1:description': { _text: 'Ангарск, 279-й квартал, 5/1' },
     // 'ns1:description': { _text: 'Иркутск' },
-    return partShortList;
+    return partList;
   } catch (error) {
     return [];
   }
@@ -163,6 +236,13 @@ export async function tissSearch(article: any): Promise<Array<TissPart>> {
 
 function rosskoToAutoPart(part: any): AutoPart {
   // console.log(part["ns1:stocks"]["ns1:stock"][0]);
+  let price;
+  try {
+    console.log(part["ns1:stocks"]);
+    price = part["ns1:stocks"]["ns1:stock"][0]["ns1:price"]._text;
+  } catch {
+    price = -1;
+  }
 
   const autoPart = {
     name: part["ns1:name"]._text,
@@ -170,7 +250,7 @@ function rosskoToAutoPart(part: any): AutoPart {
     brand: part["ns1:brand"]._text,
     article: part["ns1:partnumber"]._text,
     quantity: "",
-    price: part["ns1:stocks"]["ns1:stock"][0]["ns1:price"]._text,
+    price,
     delivery: 1,
     company: "Rossko",
   };
