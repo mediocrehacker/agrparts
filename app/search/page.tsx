@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { type AutoPart, getSearchResults } from "@/lib/search";
 import { createClient } from "@/utils/supabase/server";
+import { Parts } from "../components/parts";
 
 export default async function SearchPage({
   searchParams,
@@ -117,44 +118,6 @@ function SearchForm(props: { value: string }) {
       </div>
     </form>
   );
-}
-function Parts(props: any) {
-  return (
-    <div className="overflow-x-auto">
-      <table className="table table-zebra">
-        <thead>
-          <tr>
-            <th></th>
-            <th>Название</th>
-            <th>Бренд</th>
-            <th>Номер</th>
-            <th>Компания</th>
-            <th>Город</th>
-            <th className="text-right">Цена ₽</th>
-          </tr>
-        </thead>
-        <PartsList parts={props.parts} />
-      </table>
-    </div>
-  );
-}
-
-function PartsList(props: { parts: AutoPart[] }) {
-  const parts = props.parts;
-  const listItems = parts.map((part: AutoPart) => (
-    <>
-      <tr className="hover cursor-pointer" key={part.article + part.company}>
-        <td></td>
-        <td>{part.name}</td>
-        <td>{part.brand}</td>
-        <td>{part.article}</td>
-        <td>{part.company}</td>
-        <td></td>
-        <td className="text-right font-bold">{part.price}</td>
-      </tr>
-    </>
-  ));
-  return <tbody>{listItems}</tbody>;
 }
 
 const Navbar = (props: any) => {
