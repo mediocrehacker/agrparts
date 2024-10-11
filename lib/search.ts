@@ -49,22 +49,25 @@ function rosskoFilterByCity(parts: AutoPart[], city: string) {
   return parts;
 }
 function getUniqueRossko(brands: any): any {
-  let rosskoPartsShortList = brands
-    .map((x: any) => x["ns1:crosses"]["ns1:Part"])
-    .flat();
+  try {
+    let rosskoPartsShortList = brands
+      .map((x: any) => x["ns1:crosses"]["ns1:Part"])
+      .flat();
 
-  let uniqueArr: any[] = [];
-  rosskoPartsShortList.forEach((obj: any) => {
-    if (
-      !uniqueArr.find(
-        (item: any) => item["ns1:guid"]._text === obj["ns1:guid"]._text,
-      )
-    ) {
-      uniqueArr.push(obj);
-    }
-  });
-
-  return uniqueArr;
+    let uniqueArr: any[] = [];
+    rosskoPartsShortList.forEach((obj: any) => {
+      if (
+        !uniqueArr.find(
+          (item: any) => item["ns1:guid"]._text === obj["ns1:guid"]._text,
+        )
+      ) {
+        uniqueArr.push(obj);
+      }
+    });
+    return uniqueArr;
+  } catch {
+    return [];
+  }
 }
 
 function rosskoToAutoPartNew(part: any): AutoPart {
