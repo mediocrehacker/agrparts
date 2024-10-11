@@ -81,6 +81,8 @@ function Extra(props: { part: AutoPart }) {
       return <RosskoExtra extra={props.part.extra} />;
     case "ТИСС":
       return <TissExtra extra={props.part.extra} />;
+    case "Автолидер":
+      return <AvtoliderExtra extra={props.part.extra} />;
     default:
       return <div>No Extra Info</div>;
   }
@@ -137,6 +139,33 @@ function TissExtra(props: { extra: any }) {
         <tr>
           <th>Адрес</th>
           <th>Город</th>
+          <th>Кол-во</th>
+          <th>Доставка дней</th>
+          <th className="text-right">Цена ₽</th>
+        </tr>
+      </thead>
+      <tbody>{listItems}</tbody>
+    </table>
+  );
+}
+
+function AvtoliderExtra(props: { extra: any }) {
+  const stocks = props.extra.stock_list;
+
+  const listItems = stocks.map((stock: any) => (
+    <tr key={stock.warehouse_id}>
+      <td>{stock.warehouse_name}</td>
+      <td>{stock.quantity}</td>
+      <td>{stock.delivery_min}</td>
+      <td className="text-right">{Math.ceil(Number(stock.price))}</td>
+    </tr>
+  ));
+
+  return (
+    <table className="table">
+      <thead>
+        <tr>
+          <th>Адрес</th>
           <th>Кол-во</th>
           <th>Доставка дней</th>
           <th className="text-right">Цена ₽</th>
