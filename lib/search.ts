@@ -168,16 +168,20 @@ export async function rosskoSearch(article: string) {
      </soapenv:Body>
   </soapenv:Envelope>`;
 
-  const resp = await soapRequest({
-    url: url,
-    headers: sampleHeaders,
-    xml: xml,
-    timeout: 5000,
-  });
+  try {
+    const resp = await soapRequest({
+      url: url,
+      headers: sampleHeaders,
+      xml: xml,
+      timeout: 5000,
+    });
 
-  const { headers, body, statusCode } = resp.response;
+    const { headers, body, statusCode } = resp.response;
 
-  return body;
+    return body;
+  } catch {
+    return [];
+  }
 }
 
 export async function avtoliderSearch(article: string) {
