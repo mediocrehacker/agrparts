@@ -20,7 +20,6 @@ export async function getSearchResults(article: string, city: string) {
     rosskoParts = rosskoFilterByCity(rosskoParts, city);
   }
   const avtoliderParts = await avtoliderSearch(article);
-
   const tissParts = await tissSearch(article);
 
   parts = tissParts
@@ -49,13 +48,17 @@ function rosskoFilterByCity(parts: AutoPart[], city: string) {
   return parts;
 }
 function getUniqueRossko(brands: any): any {
+  let parts: any[];
   try {
-    let rosskoPartsShortList = brands
-      .map((x: any) => x["ns1:crosses"]["ns1:Part"])
-      .flat();
+    if (Array.isArray(brands)) {
+      parts = brands.map((x: any) => x["ns1:crosses"]["ns1:Part"]);
+    } else {
+      parts = brands["ns1:crosses"]["ns1:Part"];
+    }
+    parts = parts.flat();
 
     let uniqueArr: any[] = [];
-    rosskoPartsShortList.forEach((obj: any) => {
+    parts.forEach((obj: any) => {
       if (
         !uniqueArr.find(
           (item: any) => item["ns1:guid"]._text === obj["ns1:guid"]._text,
