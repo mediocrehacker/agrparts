@@ -20,6 +20,7 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: "ПРОЦЕНКА",
   description: "Все поставщики в одном месте.",
+  other: { "mailru-domain": "orvnEVqHsDuujt2z" },
 };
 
 export default function RootLayout({
