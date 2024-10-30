@@ -32,6 +32,41 @@ export async function getSearchResults(article: string, city: string) {
   return parts;
 }
 
+export async function getSearchResultsRossko(article: string, city: string) {
+  let parts: AutoPart[] = [];
+
+  const rosskoPartsXml = await rosskoSearch(article);
+  const rosskoPartsListWithBrands = rosskoParse(rosskoPartsXml);
+  const uniqueRossko = getUniqueRossko(rosskoPartsListWithBrands);
+  let rosskoParts = uniqueRossko.map((x: any) => rosskoToAutoPartNew(x));
+
+  city = "angarsk";
+
+  if (city) {
+    parts = rosskoFilterByCity(rosskoParts, city);
+  }
+
+  return parts;
+}
+
+export async function getSearchResultsTiss(article: string, city: string) {
+  let parts: any[] = [];
+
+  parts = await tissSearch(article);
+  parts = parts?.map((x: TissPart) => tissPartToAutoPart(x));
+
+  return parts;
+}
+
+export async function getSearchResultsAvtolider(article: string, city: string) {
+  let parts: any[] = [];
+
+  parts = await avtoliderSearch(article);
+  parts = parts?.map((x: AvtoliderPart) => avtoliderPartToAutoPart(x));
+
+  return parts;
+}
+
 function rosskoFilterByCity(parts: AutoPart[], city: string) {
   parts = parts.filter((e: any) => {
     let stock = e.extra["ns1:stocks"]["ns1:stock"][0];

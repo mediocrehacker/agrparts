@@ -1,8 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
-import { type AutoPart, getSearchResults } from "@/lib/search";
+import {
+  type AutoPart,
+  getSearchResults,
+  getSearchResultsRossko,
+} from "@/lib/search";
 import { createClient } from "@/utils/supabase/server";
-import { Parts } from "../components/parts";
+import { AvtoliderParts, TissParts, RosskoParts } from "./Components";
+import { Suspense } from "react";
 
 export default async function SearchPage({
   searchParams,
@@ -14,10 +19,6 @@ export default async function SearchPage({
 
   let article = searchParams.article?.toString() || "";
 
-  const results = await getSearchResults(article, "angarsk");
-
-  let parts = results;
-
   return (
     <div className="font-sans grid grid-rows-[20px_1fr_20px] min-h-screen pb-24 pt-4 gap-16 lg:pb-16">
       <Navbar user={data?.user} />
@@ -26,7 +27,64 @@ export default async function SearchPage({
         <div className="border-base-300 flex flex-col gap-8 overflow-x-auto p-4">
           <SearchForm value={article} />
           <div className="w-full">
-            <Parts parts={parts} />
+            <div className="overflow-x-auto">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>Название</th>
+                    <th>Бренд</th>
+                    <th>Номер</th>
+                    <th>Компания</th>
+                    <th className="text-right">Цена ₽</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <Suspense
+                    fallback={
+                      <tr>
+                        <td>+</td>
+                        <td className="skeleton"></td>
+                        <td className="skeleton"></td>
+                        <td className="skeleton"></td>
+                        <td>ТИСС</td>
+                        <td className="skeleton"></td>
+                      </tr>
+                    }
+                  >
+                    <TissParts article={article} />
+                  </Suspense>
+                  <Suspense
+                    fallback={
+                      <tr>
+                        <td>+</td>
+                        <td className="skeleton"></td>
+                        <td className="skeleton"></td>
+                        <td className="skeleton"></td>
+                        <td>Avtolider</td>
+                        <td className="skeleton"></td>
+                      </tr>
+                    }
+                  >
+                    <AvtoliderParts article={article} />
+                  </Suspense>
+                  <Suspense
+                    fallback={
+                      <tr>
+                        <td>+</td>
+                        <td className="skeleton"></td>
+                        <td className="skeleton"></td>
+                        <td className="skeleton"></td>
+                        <td>Rossko</td>
+                        <td className="skeleton"></td>
+                      </tr>
+                    }
+                  >
+                    <RosskoParts article={article} />
+                  </Suspense>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </main>

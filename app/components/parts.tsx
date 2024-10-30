@@ -23,7 +23,7 @@ export function Parts(props: any) {
   );
 }
 
-function PartsList(props: { parts: AutoPart[] }) {
+export function PartsList(props: { parts: AutoPart[] }) {
   const [expanded, setExpanded] = useState("");
 
   const parts = props.parts;
@@ -72,7 +72,7 @@ function PartsList(props: { parts: AutoPart[] }) {
       </tr>
     </Fragment>
   ));
-  return <tbody>{listItems}</tbody>;
+  return <>{listItems}</>;
 }
 
 function Extra(props: { part: AutoPart }) {
