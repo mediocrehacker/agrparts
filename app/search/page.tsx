@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Footer } from "../components/Footer";
 import {
   type AutoPart,
   getSearchResults,
@@ -89,47 +90,7 @@ export default async function SearchPage({
         </div>
       </main>
 
-      <footer className="mt-8 row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href=""
-        >
-          <Image
-            aria-hidden
-            src="/file-text.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Инструкция
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href=""
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Примеры
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://t.me/pozitiveweb3lab"
-        >
-          <Image
-            aria-hidden
-            src="/telegram.svg"
-            alt="Telegram icon"
-            width={22}
-            height={22}
-          />
-          Связаться с нами →
-        </a>
-      </footer>
+      <Footer />
     </div>
   );
 }
@@ -191,7 +152,7 @@ const Navbar = (props: any) => {
           <li>
             {(() => {
               if (props.user) {
-                return <Link href="distributors">Поставщики</Link>;
+                return <Link href="profile">Личный Кабинет</Link>;
               } else {
                 return <Link href="login">Войти / Зарегистрироваться</Link>;
               }
