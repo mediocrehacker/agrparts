@@ -9,6 +9,7 @@ export async function addCredentials(formData: FormData) {
   // type-casting here for convenience
   // in practice, you should validate your inputs
   const data = {
+    org_id: formData.get("org_id") as string,
     distributor_id: formData.get("distributor_id") as string,
     token: formData.get("token") as string,
     id: formData.get("id") as number | null,
@@ -18,14 +19,16 @@ export async function addCredentials(formData: FormData) {
 
   if (data.id) {
     resp = await supabase
-      .from("distributor_credentials")
+      .from("credentials")
       .update({
+        organization_id: data.org_id,
         distributor_id: data.distributor_id,
         token: data.token,
       })
       .eq("id", data.id);
   } else {
-    resp = await supabase.from("distributor_credentials").insert({
+    resp = await supabase.from("credentials").insert({
+      organization_id: data.org_id,
       distributor_id: data.distributor_id,
       token: data.token,
     });

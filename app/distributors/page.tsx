@@ -4,13 +4,31 @@ import { Footer } from "../components/Footer";
 import { createClient } from "@/utils/supabase/server";
 import { addCredentials, logout } from "./actions";
 
+interface Ogranization {
+  id: string;
+  name: string;
+}
+
 export default async function PrivatePage() {
   const supabase = createClient();
   const { data, error } = await supabase.auth.getUser();
   const distributors = await supabase.from("distributors").select();
-  const distributor_credentials = await supabase
-    .from("distributor_credentials")
-    .select();
+  let credentials: any[] = [];
+  let org: Ogranization | null = null;
+
+  const resp = await supabase.from("organizations").select();
+  const orgs = resp?.data;
+
+  if (orgs) {
+    org = orgs[0];
+    if (org) {
+      const { data, error } = await supabase
+        .from("credentials")
+        .select()
+        .eq("organization_id", org.id);
+      credentials = data || [];
+    }
+  }
 
   return (
     <div className="font-sans grid grid-rows-[20px_1fr_20px] min-h-screen pb-16 pt-4 gap-16">
@@ -18,11 +36,22 @@ export default async function PrivatePage() {
 
       <main className="flex flex-col gap-8 w-full max-w-screen-xl px-8 mx-auto overflow-x-auto">
         <div className="relative w-full mx-auto">
-          <Distributors
-            distributors={distributors}
-            user={data?.user}
-            credentials={distributor_credentials}
-          />
+          {(() => {
+            if (orgs && org) {
+              return (
+                <>
+                  <Distributors
+                    org={org}
+                    distributors={distributors}
+                    user={data?.user}
+                    credentials={credentials}
+                  />
+                </>
+              );
+            } else {
+              return <p>Something went wrong</p>;
+            }
+          })()}
         </div>
       </main>
 
@@ -33,7 +62,7 @@ export default async function PrivatePage() {
 
 const Distributors = (props: any) => {
   const listDistributors = props.distributors.data.map((x: any) => {
-    const cred = props.credentials.data.filter(
+    const cred = props.credentials.filter(
       (credential: any) => credential.distributor_id === x.id,
     )[0];
 
@@ -41,6 +70,12 @@ const Distributors = (props: any) => {
       <li key={x.id} className="flex flex-col gap-2 m:gap-4 items-start">
         <div className="min-w-24">{x.name}</div>
         <form className="flex flex-row gap-4" action={addCredentials}>
+          <input
+            id="org_id"
+            name="org_id"
+            type="hidden"
+            defaultValue={props.org.id}
+          />
           <input
             id="distributor_id"
             name="distributor_id"
